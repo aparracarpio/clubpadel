@@ -27,7 +27,7 @@ public class Usuario {
           * @JoinColumn: columna en la tabla usuario que guarda la FK.
           *   Aquí se llamará id_rol, igual que en tu script SQL.
           * fetch = LAZY: no carga el rol hasta que lo pidas con getRol().
-          *   Es la opción recomendada para rendimiento.
+          *   Opcion recomendada para evitar cargar datos innecesarios y mejorar el rendimiento.
           */
           @ManyToOne(fetch = FetchType.LAZY)
           @JoinColumn(name = "id_rol", nullable = false)

@@ -15,14 +15,12 @@ public class Pista {
           * @Id → esta es la clave primaria de la tabla.
           * @GeneratedValue(strategy = GenerationType.IDENTITY) →
           *   la BD genera el valor automáticamente (BIGSERIAL en PostgreSQL).
-          *   Java no necesita asignarlo manualmente.
           */
           @Id
           @GeneratedValue(strategy = GenerationType.IDENTITY)
           private Long id;
 
           // Cada campo se mapea a una columna con el mismo nombre.
-          // Puedes usar @Column(name="...") si el nombre difiere.
           private String nombre;
           private String tipo;
           private String estado;
