@@ -46,16 +46,28 @@ public class SecurityConfig {
 
             // Reglas de autorización por ruta
             .authorizeHttpRequests(auth -> auth
-                // Públicas: login y registro
+                // Públicas
                 .requestMatchers("/api/auth/**").permitAll()
-
-                // GET /api/pistas/** es público
                 .requestMatchers(HttpMethod.GET, "/api/pistas/**").permitAll()
 
-                // POST, PUT y DELETE sobre pistas solo para ADMIN
+                // Pistas: modificar solo ADMIN
                 .requestMatchers(HttpMethod.POST, "/api/pistas/**").hasRole("ADMIN")
                 .requestMatchers(HttpMethod.PUT, "/api/pistas/**").hasRole("ADMIN")
                 .requestMatchers(HttpMethod.DELETE, "/api/pistas/**").hasRole("ADMIN")
+
+                // Reservas
+                .requestMatchers(HttpMethod.POST, "/api/reservas/**").hasAnyRole("USER", "ADMIN")
+                .requestMatchers(HttpMethod.GET, "/api/reservas/mis-reservas").hasAnyRole("USER", "ADMIN")
+                .requestMatchers(HttpMethod.DELETE, "/api/reservas/**").hasAnyRole("USER", "ADMIN")
+                .requestMatchers(HttpMethod.GET, "/api/reservas").hasRole("ADMIN")
+
+                // Usuarios
+                .requestMatchers(HttpMethod.GET, "/api/usuarios/me").authenticated()
+                .requestMatchers(HttpMethod.PUT, "/api/usuarios/password").authenticated()
+                .requestMatchers("/api/usuarios/**").hasRole("ADMIN")
+
+                // Verificación en recepción
+                .requestMatchers("/api/admin/**").hasRole("ADMIN")
 
                 // Todo lo demás requiere autenticación
                 .anyRequest().authenticated()
