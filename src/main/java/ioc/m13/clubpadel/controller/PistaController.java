@@ -1,57 +1,94 @@
 package ioc.m13.clubpadel.controller;
 
+import ioc.m13.clubpadel.dto.PistaRequest;
 import ioc.m13.clubpadel.model.Pista;
-import ioc.m13.clubpadel.repository.PistaRepository;
+import ioc.m13.clubpadel.service.PistaService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/pistas")
 public class PistaController {
 
-          /* Repositorio de pistas */      
           @Autowired
-          private PistaRepository pistaRepository;
+          private PistaService pistaService;
 
-          /*Devuelve una lista de todas las pistas en formato JSON */
+          // GET /api/pistas → todas (público)
           @GetMapping
           public List<Pista> getAll() {
-                    return pistaRepository.findAll();
+                    return pistaService.listar();
           }
 
-          /*Devuelve una lista de pistas por estado disponibles en formato JSON */        
-
+          // GET /api/pistas/disponibles → solo disponibles (público)
           @GetMapping("/disponibles")
-          public List<Pista> getPistasByEstado() {
-                    return pistaRepository.findByEstado("Disponible");
+          public List<Pista> getDisponibles() {
+                    return pistaService.listarPorEstado("Disponible");
           }
 
-          /*Devuelve una lista de pistas por estado ocupadas en formato JSON */
-
+          // GET /api/pistas/ocupadas → solo ocupadas (público)
           @GetMapping("/ocupadas")
-          public List<Pista> getPistasOcupadas() {
-                    return pistaRepository.findByEstado("Ocupada");
+          public List<Pista> getOcupadas() {
+                    return pistaService.listarPorEstado("Ocupada");
           }
 
-          /* Cambia estado pista a ocupada */
-          @GetMapping("/ocupar/{id}")
-          public void ocuparPista(@PathVariable Long id) {
-                    Pista pista = pistaRepository.findById(id).orElse(null);
-                    if (pista != null) {
-                              pista.setEstado("Ocupada");
-                              pistaRepository.save(pista);
+          // GET /api/pistas/{id} → una pista (público)
+          @GetMapping("/{id}")
+          public ResponseEntity<?> getById(@PathVariable Long id) {
+                    try {
+                              return ResponseEntity.ok(pistaService.buscarPorId(id));
+                    } catch (RuntimeException e) {
+                              return ResponseEntity.notFound().build();
                     }
           }
 
-          /* Cambia estado pista a disponible */
-          @GetMapping("/liberar/{id}")
-          public void liberarPista(@PathVariable Long id) {
-                    Pista pista = pistaRepository.findById(id).orElse(null);
-                    if (pista != null) {
-                              pista.setEstado("Disponible");
-                              pistaRepository.save(pista);
+          // POST /api/pistas → crear (ADMIN)
+          @PostMapping
+          public Pista crear(@RequestBody PistaRequest req) {
+                    return pistaService.crear(req);
+          }
+
+          // PUT /api/pistas/{id} → editar (ADMIN)
+          @PutMapping("/{id}")
+          public ResponseEntity<?> editar(@PathVariable Long id, @RequestBody PistaRequest req) {
+                    try {
+                              return ResponseEntity.ok(pistaService.editar(id, req));
+                    } catch (RuntimeException e) {
+                              return ResponseEntity.notFound().build();
                     }
           }
+
+          // DELETE /api/pistas/{id} → eliminar (ADMIN)
+          @DeleteMapping("/{id}")
+          public ResponseEntity<?> eliminar(@PathVariable Long id) {
+                    try {
+                              pistaService.eliminar(id);
+                              return ResponseEntity.ok(Map.of("mensaje", "Pista eliminada"));
+                    } catch (RuntimeException e) {
+                              return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+                    }
+          }
+
+          // PUT /api/pistas/{id}/ocupar → cambiar a Ocupada (ADMIN)
+          @PutMapping("/{id}/ocupar")
+          public ResponseEntity<?> ocupar(@PathVariable Long id) {
+                    try {
+                              return ResponseEntity.ok(pistaService.ocupar(id));
+                    } catch (RuntimeException e) {
+                              return ResponseEntity.notFound().build();
+                    }         
+          }
+
+          // PUT /api/pistas/{id}/liberar → cambiar a Disponible (ADMIN)
+          @PutMapping("/{id}/liberar")
+          public ResponseEntity<?> liberar(@PathVariable Long id) {
+                    try {
+                              return ResponseEntity.ok(pistaService.liberar(id));
+                    } catch (RuntimeException e) {
+                              return ResponseEntity.notFound().build();
+                    }
+          }         
 }
