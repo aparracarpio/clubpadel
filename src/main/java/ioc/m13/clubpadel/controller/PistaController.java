@@ -34,4 +34,24 @@ public class PistaController {
           public List<Pista> getPistasOcupadas() {
                     return pistaRepository.findByEstado("Ocupada");
           }
+
+          /* Cambia estado pista a ocupada */
+          @GetMapping("/ocupar/{id}")
+          public void ocuparPista(@PathVariable Long id) {
+                    Pista pista = pistaRepository.findById(id).orElse(null);
+                    if (pista != null) {
+                              pista.setEstado("Ocupada");
+                              pistaRepository.save(pista);
+                    }
+          }
+
+          /* Cambia estado pista a disponible */
+          @GetMapping("/liberar/{id}")
+          public void liberarPista(@PathVariable Long id) {
+                    Pista pista = pistaRepository.findById(id).orElse(null);
+                    if (pista != null) {
+                              pista.setEstado("Disponible");
+                              pistaRepository.save(pista);
+                    }
+          }
 }
