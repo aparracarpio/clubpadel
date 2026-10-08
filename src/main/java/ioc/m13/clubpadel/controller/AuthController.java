@@ -5,9 +5,13 @@ import ioc.m13.clubpadel.dto.LoginResponse;
 import ioc.m13.clubpadel.dto.RegisterRequest;
 import ioc.m13.clubpadel.model.Usuario;
 import ioc.m13.clubpadel.service.AuthService;
+
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import org.slf4j.Logger;
 
 import java.util.Map;
 
@@ -36,6 +40,8 @@ public class AuthController {
         }
     }
 
+    private static final Logger log = LoggerFactory.getLogger(AuthController.class);
+
     // POST /api/auth/login
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest req) {
@@ -43,6 +49,7 @@ public class AuthController {
             LoginResponse res = authService.login(req);
             return ResponseEntity.ok(res);
         } catch (Exception e) {
+            log.error("ERROR EN LOGIN para {}: {}", req.getEmail(), e.getMessage(), e);
             return ResponseEntity.status(401).body(Map.of("error", "Credenciales incorrectas"));
         }
     }
