@@ -9,65 +9,44 @@ import ioc.m13.clubpadel.repository.RolRepository;
 import ioc.m13.clubpadel.repository.UsuarioRepository;
 import ioc.m13.clubpadel.security.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
 public class AuthService {
 
-    @Autowired
-    private UsuarioRepository usuarioRepository;
+    @Autowired private UsuarioRepository usuarioRepository;
+    @Autowired private RolRepository rolRepository;
+    @Autowired private PasswordEncoder passwordEncoder;
+    @Autowired private JwtUtil jwtUtil;
 
-    @Autowired
-    private RolRepository rolRepository;
-
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-
-    @Autowired
-    private JwtUtil jwtUtil;
-
-    @Autowired
-    private AuthenticationManager authenticationManager;
-
-    // Registro de un nuevo usuario (rol USER por defecto)
     public Usuario register(RegisterRequest req) {
-        // Comprobar si ya existe
         if (usuarioRepository.existsByEmail(req.getEmail())) {
             throw new RuntimeException("El email ya está registrado");
         }
-
-        // Buscar el rol USER
         Rol rolUser = rolRepository.findByNombre("USER")
-                .orElseThrow(() -> new RuntimeException("Rol USER no encontrado en la BD"));
-
+                .orElseThrow(() -> new RuntimeException("Rol USER no encontrado"));
         Usuario u = new Usuario();
         u.setNombre(req.getNombre());
         u.setEmail(req.getEmail());
-        u.setPassword(passwordEncoder.encode(req.getPassword()));  // BCrypt
+        u.setPassword(passwordEncoder.encode(req.getPassword()));
         u.setTelefono(req.getTelefono());
         u.setRol(rolUser);
-
         return usuarioRepository.save(u);
     }
 
-    // Login: autentica y devuelve JWT + datos del usuario
     public LoginResponse login(LoginRequest req) {
-        // Autentica con Spring Security (compara password con el hash BCrypt)
-        Authentication auth = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(req.getEmail(), req.getPassword())
-        );
-
-        // Si llega aquí, las credenciales son correctas
+        // 1. Buscar el usuario
         Usuario usuario = usuarioRepository.findByEmail(req.getEmail())
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+                .orElseThrow(() -> new RuntimeException("Credenciales incorrectas"));
 
-        // Generar token con email y rol
+        // 2. Comparar la contraseña con el hash BCrypt
+        if (!passwordEncoder.matches(req.getPassword(), usuario.getPassword())) {
+            throw new RuntimeException("Credenciales incorrectas");
+        }
+
+        // 3. Generar el token
         String token = jwtUtil.generateToken(usuario.getEmail(), usuario.getRol().getNombre());
-
         return new LoginResponse(token, usuario.getRol().getNombre(), usuario.getNombre());
     }
 }
