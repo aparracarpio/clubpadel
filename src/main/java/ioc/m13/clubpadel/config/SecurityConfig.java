@@ -47,6 +47,7 @@ public class SecurityConfig {
             // Reglas de autorización por ruta
             .authorizeHttpRequests(auth -> auth
                 // Públicas
+                .requestMatchers("/api/health").permitAll()
                 .requestMatchers("/api/auth/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/pistas/**").permitAll()
 
