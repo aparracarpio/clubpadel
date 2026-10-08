@@ -37,7 +37,7 @@ public class AuthService {
 
     public LoginResponse login(LoginRequest req) {
         // 1. Buscar el usuario
-        Usuario usuario = usuarioRepository.findByEmail(req.getEmail())
+        Usuario usuario = usuarioRepository.findByEmailWithRol(req.getEmail())
                 .orElseThrow(() -> new RuntimeException("Credenciales incorrectas (mail no encontrado)"));
 
         // 2. Comparar la contraseña con el hash BCrypt
