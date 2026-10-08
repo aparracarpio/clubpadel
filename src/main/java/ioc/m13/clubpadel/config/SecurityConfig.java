@@ -53,7 +53,7 @@ public class SecurityConfig {
 
                 // Reservas
                 .requestMatchers(HttpMethod.POST, "/api/reservas/**").hasAnyRole("USER", "ADMIN")
-                .requestMatchers(HttpMethod.GET, "/api/reservas/mis-reservas").hasAnyRole("USER", "ADMIN")
+                .requestMatchers(HttpMethod.GET, "/api/reservas/mis-reservas").permitAll()
                 .requestMatchers(HttpMethod.DELETE, "/api/reservas/**").hasAnyRole("USER", "ADMIN")
                 .requestMatchers(HttpMethod.GET, "/api/reservas").hasRole("ADMIN")
 
