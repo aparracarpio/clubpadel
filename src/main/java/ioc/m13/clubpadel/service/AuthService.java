@@ -24,14 +24,18 @@ public class AuthService {
         if (usuarioRepository.existsByEmail(req.getEmail())) {
             throw new RuntimeException("El email ya está registrado");
         }
+
         Rol rolUser = rolRepository.findByNombre("USER")
                 .orElseThrow(() -> new RuntimeException("Rol USER no encontrado"));
+
         Usuario u = new Usuario();
+
         u.setNombre(req.getNombre());
         u.setEmail(req.getEmail());
         u.setPassword(passwordEncoder.encode(req.getPassword()));
         u.setTelefono(req.getTelefono());
         u.setRol(rolUser);
+
         return usuarioRepository.save(u);
     }
 
@@ -41,9 +45,9 @@ public class AuthService {
                 .orElseThrow(() -> new RuntimeException("Credenciales incorrectas (mail no encontrado)"));
 
         // 2. Comparar la contraseña con el hash BCrypt
-        //if (!passwordEncoder.matches(req.getPassword(), usuario.getPassword())) {
-        //    throw new RuntimeException("Credenciales incorrectas (contraseña incorrecta)");
-        //}
+        if (!passwordEncoder.matches(req.getPassword(), usuario.getPassword())) {
+           throw new RuntimeException("Credenciales incorrectas (contraseña incorrecta)");
+        }
 
         // 3. Generar el token
         String token = jwtUtil.generateToken(usuario.getEmail(), usuario.getRol().getNombre());
