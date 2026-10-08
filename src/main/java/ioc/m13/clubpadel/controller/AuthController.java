@@ -14,10 +14,13 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
-
+    
     @Autowired
     private AuthService authService;
 
+    @Autowired private ioc.m13.clubpadel.repository.UsuarioRepository usuarioRepository;
+    @Autowired private org.springframework.security.crypto.password.PasswordEncoder passwordEncoder;
+    
     // POST /api/auth/register
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody RegisterRequest req) {
@@ -42,5 +45,22 @@ public class AuthController {
         } catch (Exception e) {
             return ResponseEntity.status(401).body(Map.of("error", "Credenciales incorrectas"));
         }
+    }
+
+    @PostMapping("/debug/check")
+    public Map<String, Object> debugCheck(@RequestBody LoginRequest req) {
+        var usuarioOpt = usuarioRepository.findByEmail(req.getEmail());
+        if (usuarioOpt.isEmpty()) {
+            return Map.of("existe", false, "mensaje", "Usuario no encontrado");
+        }
+        var u = usuarioOpt.get();
+        boolean matches = passwordEncoder.matches(req.getPassword(), u.getPassword());
+        return Map.of(
+            "existe", true,
+            "email", u.getEmail(),
+            "hashGuardado", u.getPassword(),
+            "passwordEnviada", req.getPassword(),
+            "coincide", matches
+        );
     }
 }
