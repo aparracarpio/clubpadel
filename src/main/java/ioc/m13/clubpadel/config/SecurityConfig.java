@@ -86,14 +86,6 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
-    // Proveedor de autenticación que usa nuestro UserDetailsService y el encoder
-    @Bean
-    public DaoAuthenticationProvider authenticationProvider() {
-        DaoAuthenticationProvider provider = new DaoAuthenticationProvider(userDetailsService);
-        provider.setPasswordEncoder(passwordEncoder());
-        return provider;
-    }
-
     // Necesario para autenticar manualmente en el AuthService
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
