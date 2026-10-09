@@ -2,6 +2,7 @@ package ioc.m13.clubpadel.config;
 
 import ioc.m13.clubpadel.security.JwtFilter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -30,16 +31,9 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-            // Desactivar CSRF (no aplica a APIs REST con JWT)
             .csrf(csrf -> csrf.disable())
-
-            // Configuración de CORS
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-
-            // Sin sesiones: cada petición se autentica con su token
             .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-
-            // Reglas de autorización por ruta
             .authorizeHttpRequests(auth -> auth
                 // Públicas
                 .requestMatchers("/api/health").permitAll()
@@ -62,32 +56,34 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.PUT, "/api/usuarios/password").authenticated()
                 .requestMatchers("/api/usuarios/**").hasRole("ADMIN")
 
-                // Verificación en recepción
+                // Verificación
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
 
-                // Todo lo demás requiere autenticación
                 .anyRequest().authenticated()
             )
-
-            // Añadir el filtro JWT antes del filtro de autenticación estándar
             .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
 
-    // Codificador de contraseñas con BCrypt
+    // Desactiva el registro automático del JwtFilter como servlet filter.
+    @Bean
+    public FilterRegistrationBean<JwtFilter> jwtFilterRegistration(JwtFilter filter) {
+        FilterRegistrationBean<JwtFilter> registration = new FilterRegistrationBean<>(filter);
+        registration.setEnabled(false);
+        return registration;
+    }
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
-    // Necesario para autenticar manualmente en el AuthService
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
     }
 
-    // CORS: permitir peticiones desde cualquier origen (en producción, restringir)
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
