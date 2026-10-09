@@ -10,6 +10,7 @@ import ioc.m13.clubpadel.repository.ReservaRepository;
 import ioc.m13.clubpadel.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -20,6 +21,7 @@ public class ReservaService {
     @Autowired private UsuarioRepository usuarioRepository;
     @Autowired private PistaRepository pistaRepository;
 
+    @Transactional
     public ReservaResponse crear(String emailUsuario, ReservaRequest req) {
         Usuario usuario = usuarioRepository.findByEmail(emailUsuario)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
@@ -54,6 +56,7 @@ public class ReservaService {
         return toResponse(reservaRepository.save(reserva));
     }
 
+    @Transactional(readOnly = true)
     public List<ReservaResponse> misReservas(String emailUsuario) {
         Usuario usuario = usuarioRepository.findByEmail(emailUsuario)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
@@ -61,6 +64,7 @@ public class ReservaService {
                 .stream().map(this::toResponse).toList();
     }
 
+    @Transactional
     public void cancelar(Long idReserva, String emailUsuario, boolean esAdmin) {
         Reserva r = reservaRepository.findById(idReserva)
                 .orElseThrow(() -> new RuntimeException("Reserva no encontrada"));
@@ -73,6 +77,7 @@ public class ReservaService {
         reservaRepository.save(r);
     }
 
+    @Transactional(readOnly = true)
     public List<ReservaResponse> todas() {
         return reservaRepository.findAll().stream().map(this::toResponse).toList();
     }
