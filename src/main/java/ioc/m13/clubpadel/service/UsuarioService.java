@@ -7,6 +7,7 @@ import ioc.m13.clubpadel.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -19,10 +20,12 @@ public class UsuarioService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Transactional(readOnly = true)
     public List<UsuarioResponse> listar() {
         return usuarioRepository.findAll().stream().map(this::toResponse).toList();
     }
 
+    @Transactional(readOnly = true)
     public UsuarioResponse buscarPorEmail(String email) {
         Usuario u = usuarioRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
