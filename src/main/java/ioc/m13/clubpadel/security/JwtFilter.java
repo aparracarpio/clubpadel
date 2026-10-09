@@ -28,36 +28,46 @@ public class JwtFilter extends OncePerRequestFilter {
                                         HttpServletResponse response,
                                         FilterChain filterChain) throws ServletException, IOException {
 
-                    // 1. Lee la cabecera "Authorization"
-                    String authHeader = request.getHeader("Authorization");
+          String uri = request.getRequestURI();
+          System.out.println(">>> JWT FILTER: " + request.getMethod() + " " + uri);
 
-                    // 2. Si no hay token o no empieza por "Bearer ", deja pasar sin autenticar
-                    if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-                              filterChain.doFilter(request, response);
-                              return;
-                    }
+          String authHeader = request.getHeader("Authorization");
+          if (authHeader == null) {
+          System.out.println(">>> SIN HEADER Authorization");
+          filterChain.doFilter(request, response);
+          return;
+          }
+          System.out.println(">>> Header: " + authHeader.substring(0, Math.min(50, authHeader.length())) + "...");
 
-                    // 3. Extrae el token (quita "Bearer ")
-                    String token = authHeader.substring(7);
+          if (!authHeader.startsWith("Bearer ")) {
+          System.out.println(">>> No empieza por Bearer");
+          filterChain.doFilter(request, response);
+          return;
+          }
 
-                    // 4. Valida el token
-                    if (jwtUtil.isTokenValid(token)) {
-                              String email = jwtUtil.extractEmail(token);
-                              String rol = jwtUtil.extractRol(token);
+          String token = authHeader.substring(7);
+          boolean valido = jwtUtil.isTokenValid(token);
+          System.out.println(">>> Token válido: " + valido);
 
-                              // 5. Crea el objeto de autenticación y lo pone en el contexto de Spring
-                              UsernamePasswordAuthenticationToken auth =
-                              new UsernamePasswordAuthenticationToken(
-                                        email,
-                                        null,
-                                        List.of(new SimpleGrantedAuthority("ROLE_" + rol))
-                              );
-                              auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                              SecurityContextHolder.getContext().setAuthentication(auth);
-                    }
+          if (valido) {
+          String email = jwtUtil.extractEmail(token);
+          String rol = jwtUtil.extractRol(token);
+          System.out.println(">>> Email: " + email + " | Rol: " + rol);
 
-                    // 6. Continúa con el siguiente filtro
-                    filterChain.doFilter(request, response);
+          UsernamePasswordAuthenticationToken auth =
+                    new UsernamePasswordAuthenticationToken(
+                              email,
+                              null,
+                              List.of(new SimpleGrantedAuthority("ROLE_" + rol))
+                    );
+          auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+          SecurityContextHolder.getContext().setAuthentication(auth);
+          System.out.println(">>> Autenticación establecida en el contexto");
+          } else {
+          System.out.println(">>> Token INVÁLIDO — no se autentica");
+          }
+
+          filterChain.doFilter(request, response);
           }
           
 }
