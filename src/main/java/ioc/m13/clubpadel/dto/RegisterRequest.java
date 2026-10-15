@@ -1,5 +1,9 @@
 package ioc.m13.clubpadel.dto;
 
+/**
+ * DTO con datos enviados por el cliente en la petición POST /api/auth/register
+ * Backend hashea contraseña con BCrypt antes de guardarla en la base de datos.
+ */
 public class RegisterRequest {
           // Campos que recibimos en el body de la petición POST /register
           private String nombre;

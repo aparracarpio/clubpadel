@@ -1,5 +1,9 @@
 package ioc.m13.clubpadel.dto;
 
+/**
+ * DTO con datos enviados por el cliente en la petición POST /api/auth/login
+ * El backend genera un token JWT y lo devuelve en la respuesta.
+ */
 public class LoginResponse {
           // Campos que enviamos en la respuesta de la petición POST /login
           private String token;

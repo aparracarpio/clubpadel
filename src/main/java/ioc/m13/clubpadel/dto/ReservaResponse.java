@@ -3,7 +3,13 @@ package ioc.m13.clubpadel.dto;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
+/**
+ * ReservaResponse, DTO con datos publicos de una reserva.
+ * No incluye datos sensibles.
+ * Forma segura de exponer reserva en respuestas de la API.
+ */
 public class ReservaResponse {
+          /* Atributos de la reserva que se van a exponer en la respuesta */
           private Long id;
           private Long idUsuario;
           private String nombreUsuario;

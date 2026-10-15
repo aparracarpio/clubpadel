@@ -4,7 +4,8 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 
 /**
-* DTO para recibir datos de una reserva en POST /api/reservas
+* DTO para recibir datos de una reserva en POST /api/reservas enviados por el cliente (usuario).
+          Usuario se obtiene del JWT, no se envia en body.
 */
 public class ReservaRequest {
           private Long idPista;
