@@ -21,19 +21,41 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.List;
 
+/*
+ * Configuración de seguridad central del Backend para ClubPadel.
+ * Define:
+ *   - Qué rutas son públicas y cuáles requieren autenticación.
+ *   - Qué roles (ADMIN/USER) pueden acceder a cada ruta.
+ *   - Como se valida el JWT en cada petición.
+ *   - Encoder de contraseñas.
+ *   - Politicas CORS para permitir peticiones desde la app Android.
+*/
+
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
 
+    /* 
+     * Filtro para manejar los tokens JWT 
+    */
     @Autowired
     private JwtFilter jwtFilter;
-
+    /**
+     * Define cadena de filtros de seguridad: reglas de autorización, gestion de sesión, CORS, CSRF y filtro JWT.
+     * @param http objeto de configuración de seguridad HTTP
+     * @return cadena de filtros de construida
+     * @throws Exception en caso de fallo al construir la cadena.
+     */
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
+            // CSRF desactivado para API stateless (no se usan cookies de sesión)
             .csrf(csrf -> csrf.disable())
+            // Aplicar configuraciones CORS definidas en corsConfigurationSource()
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+            // Sin sesiones HTTP, cada petición debe incluir el token JWT
             .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            // Reglas de autorización para cada ruta
             .authorizeHttpRequests(auth -> auth
                 // Públicas
                 .requestMatchers("/api/health").permitAll()
@@ -59,10 +81,12 @@ public class SecurityConfig {
                 // Verificación
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
 
-                .anyRequest().authenticated()
+                // Cualquier otra petición requiere autenticación
+                .anyRequest().authenticated() 
             )
+            // Añade el filtro JWT antes del filtro de autenticación de Spring Security
             .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
-
+        // Construye y devuelve la cadena de filtros    
         return http.build();
     }
 
@@ -73,17 +97,20 @@ public class SecurityConfig {
         registration.setEnabled(false);
         return registration;
     }
-
+    // Bean encargado de codificar y verificar contraseñas usando BCrypt. Se inyecta en los servicios de usuario.
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
-
+    // Obtiene el AuthenticationManager de Spring Security para autenticar usuarios en el servicio de autenticación.
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
     }
-
+    /*
+     * Define la configuración CORS para permitir peticiones desde cualquier origen, 
+     * con cualquier método y cabecera, y permitir credenciales (cookies, headers de autenticación).
+     */
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
