@@ -11,26 +11,49 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * 
+ * UsuarioController, controlador REST para recurso Usuario.
+ *        Ruta base: /api/usuarios
+ *        Metodos: GET, PUT, DELETE
+ *                  GET → listar todos (ADMIN)
+ *                  PUT → actualizar perfil (USER/ADMIN)
+ *                  DELETE → eliminar (ADMIN)
+ */
+
 @RestController
 @RequestMapping("/api/usuarios")
 public class UsuarioController {
-
+          /* Servicio con logica de negocio para usuarios */
           @Autowired
           private UsuarioService usuarioService;
 
-          // GET /api/usuarios → listar todos (ADMIN)
+          /**
+           * GET /api/usuarios → devuelve lista de todos los usuarios (solo ADMIN)
+           * @return lista usuarios (UsuarioResponse) con email, nombre y rol
+           */
           @GetMapping
           public List<UsuarioResponse> listar() {
                     return usuarioService.listar();
           }
 
-          // GET /api/usuarios/me → mi perfil
+          /**
+           * GET /api/usuarios/me → devuelve datos del usuario logueado (email, nombre, rol)
+           * @param auth información del usuario logueado (email)
+           * @return UsuarioResponse con datos del usuario logueado
+           */
           @GetMapping("/me")
           public UsuarioResponse me(Authentication auth) {
                     return usuarioService.buscarPorEmail(auth.getName());
           }
 
-          // PUT /api/usuarios/password → cambiar contraseña
+          /**
+           * PUT /api/usuarios/password → cambiar contraseña del usuario logueado
+           * @param req DTO con password actual y nueva contraseña
+           * @param auth información del usuario logueado (email)
+           * @return 200 -> contraseña actualizada correctamente
+           *         400 -> error (password actual incorrecta, nueva contraseña inválida, etc.)
+           */
           @PutMapping("/password")
           public ResponseEntity<?> cambiarPassword(@RequestBody CambiarPasswordRequest req,
                                                   Authentication auth) {
@@ -42,7 +65,12 @@ public class UsuarioController {
                     }
           }
 
-          // DELETE /api/usuarios/{id} → eliminar (ADMIN)
+          /**
+           * DELETE /api/usuarios/{id} -> eliminar usuario por id (solo ADMIN)
+           * @param id identificador usuario
+           * @return 200 -> usuario eliminado correctamente
+           *         400 -> error (usuario no existe, etc.)
+           */
           @DeleteMapping("/{id}")
           public ResponseEntity<?> eliminar(@PathVariable Long id) {
                     try {

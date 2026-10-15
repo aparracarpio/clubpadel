@@ -10,32 +10,56 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * 
+ * PistaController
+ * Controlador REST para recurso Pista.
+ *        Ruta base: /api/pistas
+ *        Metodos: GET, POST, PUT, DELETE
+ *                  GET -> todas (público)
+ *                  POST, PUT, DELETE -> solo ADMIN
+ */
+
 @RestController
 @RequestMapping("/api/pistas")
 public class PistaController {
 
+          // Servicio con logica de negocio para pistas
           @Autowired
           private PistaService pistaService;
 
-          // GET /api/pistas → todas (público)
+          /**
+           * GET /api/pistas → devuelve lista de todas las pistas (público)
+           * @return lista pistas (Pista) con id, nombre, estado
+           */
           @GetMapping
           public List<Pista> getAll() {
                     return pistaService.listar();
           }
 
-          // GET /api/pistas/disponibles → solo disponibles (público)
+          /**
+           * GET /api/pistas/disponibles → devuelve lista de pistas disponibles (público)
+           * @return lista pistas (Pista) con id, nombre, estado
+           */
           @GetMapping("/disponibles")
           public List<Pista> getDisponibles() {
                     return pistaService.listarPorEstado("Disponible");
           }
 
-          // GET /api/pistas/ocupadas → solo ocupadas (público)
+          /**
+           * GET /api/pistas/ocupadas → devuelve lista de pistas ocupadas (público)
+           * @return lista pistas (Pista) con id, nombre, estado
+           */
           @GetMapping("/ocupadas")
           public List<Pista> getOcupadas() {
                     return pistaService.listarPorEstado("Ocupada");
           }
 
-          // GET /api/pistas/{id} → una pista (público)
+          /**
+           * GET /api/pistas/{id} → devuelve una pista por su ID (público)
+           * @param id identificador pista
+           * @return pista (Pista) con id, nombre, estado
+           */
           @GetMapping("/{id}")
           public ResponseEntity<?> getById(@PathVariable Long id) {
                     try {
@@ -45,13 +69,22 @@ public class PistaController {
                     }
           }
 
-          // POST /api/pistas → crear (ADMIN)
+          /**
+           * POST /api/pistas → crear pista (solo ADMIN)
+           * @param req DTO con datos de pista (nombre, estado)
+           * @return pista creada (Pista) con id, nombre, estado
+           */
           @PostMapping
           public Pista crear(@RequestBody PistaRequest req) {
                     return pistaService.crear(req);
           }
 
-          // PUT /api/pistas/{id} → editar (ADMIN)
+          /**
+           * PUT /api/pistas/{id} → editar pista (solo ADMIN)
+           * @param id identificador pista
+           * @param req DTO con datos de pista (nombre, estado)
+           * @return pista editada (Pista) con id, nombre, estado
+           */
           @PutMapping("/{id}")
           public ResponseEntity<?> editar(@PathVariable Long id, @RequestBody PistaRequest req) {
                     try {
@@ -61,7 +94,11 @@ public class PistaController {
                     }
           }
 
-          // DELETE /api/pistas/{id} → eliminar (ADMIN)
+          /**
+           * DELETE /api/pistas/{id} → eliminar pista (solo ADMIN)
+           * @param id identificador pista
+           * @return mensaje de confirmación
+           */
           @DeleteMapping("/{id}")
           public ResponseEntity<?> eliminar(@PathVariable Long id) {
                     try {
@@ -72,7 +109,11 @@ public class PistaController {
                     }
           }
 
-          // PUT /api/pistas/{id}/ocupar → cambiar a Ocupada (ADMIN)
+          /**
+           * PUT /api/pistas/{id}/ocupar → cambiar a Ocupada (ADMIN)
+           * @param id identificador pista
+           * @return pista editada (Pista) con id, nombre, estado
+           */
           @PutMapping("/{id}/ocupar")
           public ResponseEntity<?> ocupar(@PathVariable Long id) {
                     try {
@@ -82,7 +123,11 @@ public class PistaController {
                     }         
           }
 
-          // PUT /api/pistas/{id}/liberar → cambiar a Disponible (ADMIN)
+          /**
+           * PUT /api/pistas/{id}/liberar → cambiar a Disponible (ADMIN)
+           * @param id identificador pista
+           * @return pista editada (Pista) con id, nombre, estado
+           */
           @PutMapping("/{id}/liberar")
           public ResponseEntity<?> liberar(@PathVariable Long id) {
                     try {
