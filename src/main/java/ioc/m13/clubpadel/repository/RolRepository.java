@@ -6,6 +6,9 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
+/**
+ * Repositorio para gestionar operaciones de persistencia de roles
+ */
 @Repository
 public interface RolRepository extends JpaRepository<Rol, Long> {
 

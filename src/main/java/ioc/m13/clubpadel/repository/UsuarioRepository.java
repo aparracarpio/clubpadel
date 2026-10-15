@@ -8,6 +8,9 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
+/**
+ * Repositorio para gestionar operaciones de persistencia de usuarios
+ */
 @Repository
 public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
 

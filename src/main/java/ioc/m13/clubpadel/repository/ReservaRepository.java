@@ -9,6 +9,9 @@ import org.springframework.stereotype.Repository;
 import java.time.LocalDate;
 import java.util.List;
 
+/**
+ * Repositorio para gestionar operaciones de persistencia de reservas
+ */
 @Repository
 public interface ReservaRepository extends JpaRepository<Reserva, Long> {
 
@@ -23,7 +26,6 @@ public interface ReservaRepository extends JpaRepository<Reserva, Long> {
     @Query("SELECT r FROM Reserva r JOIN FETCH r.usuario JOIN FETCH r.pista")
     List<Reserva> findAllConRelaciones();
 
-    
     List<Reserva> findByUsuarioId(Long usuarioId);
     List<Reserva> findByPistaIdAndFecha(Long pistaId, LocalDate fecha);
     List<Reserva> findByPistaIdAndFechaAndEstado(Long pistaId, LocalDate fecha, String estado);
