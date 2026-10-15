@@ -10,7 +10,10 @@ import org.springframework.stereotype.Service;
 import ioc.m13.clubpadel.model.Usuario;
 import ioc.m13.clubpadel.repository.UsuarioRepository;
 import java.util.List;
-
+/**
+ * CustomUserDetailsService, implementa UserDetailsService para cargar detalles del usuario desde la base de datos.
+ * Se utiliza para cargar el usuario durante la autenticación y para obtener sus roles.
+ */
 @Service 
 public class CustomUserDetailsService implements UserDetailsService {
           @Autowired 

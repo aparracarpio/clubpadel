@@ -9,14 +9,20 @@ import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
-
+/**
+ * JwtUtil, clase utilitaria para generar y validar tokens JWT.
+ *        Se encarga de:
+ *        - Generar token firmado con email y rol del usuario.
+ *        - Extraer email y rol del token.
+ *        - Validar token (firma y expiración).
+ */
 @Component 
 public class JwtUtil {
           // Inyectamos las propiedades del archivo application.properties
           // secret: clave secreta para firmar el token
-          // expiration: tiempo de expiración del token en milisegundos
           @Value ("${jwt.secret}")
           private String secret;
+          // expiration: tiempo de expiración del token en milisegundos
           @Value ("${jwt.expiration}")
           private long expiration;
 
