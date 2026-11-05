@@ -143,4 +143,18 @@ public class ReservaService {
         r.setHoraFin(req.getHoraFin());
         return toResponse(reservaRepository.save(r));
     }
+
+    @Transactional
+    public ReservaResponse cambiarEstado(Long id, String nuevoEstado) {
+        Reserva r = reservaRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Reserva no encontrada"));
+        
+        // Opcional: Validar que el estado sea uno de los permitidos
+        if (!nuevoEstado.equals("Activa") && !nuevoEstado.equals("Cancelada") && !nuevoEstado.equals("Completada")) {
+            throw new RuntimeException("Estado no válido");
+        }
+
+        r.setEstado(nuevoEstado);
+        return toResponse(reservaRepository.save(r));
+    }
 }

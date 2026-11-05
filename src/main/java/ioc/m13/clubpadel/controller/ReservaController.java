@@ -93,4 +93,13 @@ public class ReservaController {
         }
     }
 
+    @PutMapping("/{id}/estado")
+    public ResponseEntity<?> cambiarEstado(@PathVariable Long id, @RequestBody ioc.m13.clubpadel.dto.EstadoReservaRequest req) {
+        try {
+            return ResponseEntity.ok(reservaService.cambiarEstado(id, req.getEstado()));
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
+    }
+
 }
