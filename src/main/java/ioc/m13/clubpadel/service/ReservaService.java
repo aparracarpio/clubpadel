@@ -127,4 +127,20 @@ public class ReservaService {
                 r.getEstado()
         );
     }
+
+    @Transactional
+     public ReservaResponse actualizar(Long id, ReservaRequest req) {
+        Reserva r = reservaRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Reserva no encontrada"));
+        
+        // Validar que la hora fin sea posterior a la hora inicio
+        if (!req.getHoraFin().isAfter(req.getHoraInicio())) {
+            throw new RuntimeException("La hora de fin debe ser posterior a la de inicio");
+        }
+
+        r.setFecha(req.getFecha());
+        r.setHoraInicio(req.getHoraInicio());
+        r.setHoraFin(req.getHoraFin());
+        return toResponse(reservaRepository.save(r));
+    }
 }

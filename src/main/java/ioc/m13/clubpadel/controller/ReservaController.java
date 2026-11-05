@@ -83,4 +83,14 @@ public class ReservaController {
     public List<ReservaResponse> todas() {
         return reservaService.todas();
     }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<?> actualizar(@PathVariable Long id, @RequestBody ReservaRequest req) {
+        try {
+            return ResponseEntity.ok(reservaService.actualizar(id, req));
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
+    }
+
 }
