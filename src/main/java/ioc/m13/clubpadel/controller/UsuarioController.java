@@ -80,4 +80,18 @@ public class UsuarioController {
                               return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
                     }
           }
+
+          /**
+           *  PUT /api/usuarios/{id} -> actualizar datos del usuario por id (solo ADMIN)
+           * @param id identificador usuario
+           *           */
+          @PutMapping("/{id}")
+          public ResponseEntity<?> editar(@PathVariable Long id, @RequestBody ioc.m13.clubpadel.dto.UsuarioRequest req) {
+                    try {
+                              usuarioService.actualizar(id, req);
+                              return ResponseEntity.ok(java.util.Map.of("mensaje", "Usuario actualizado"));
+                    } catch (RuntimeException e) {
+                              return ResponseEntity.badRequest().body(java.util.Map.of("error", e.getMessage()));
+                    }
+          }
 }

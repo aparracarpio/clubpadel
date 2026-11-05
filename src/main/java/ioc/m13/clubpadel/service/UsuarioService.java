@@ -86,4 +86,14 @@ public class UsuarioService {
                 u.getRol().getNombre()
         );
     }
+
+    @Transactional
+    public void actualizar(Long id, ioc.m13.clubpadel.dto.UsuarioRequest req) {
+        Usuario u = usuarioRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+        u.setNombre(req.getNombre());
+        u.setEmail(req.getEmail());
+        u.setTelefono(req.getTelefono());
+        usuarioRepository.save(u);
+    }
 }
